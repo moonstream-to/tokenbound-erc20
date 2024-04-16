@@ -5,7 +5,7 @@ import {IERC6551Registry} from "../lib/erc6551/src/ERC6551Registry.sol";
 import {ERC20} from "../lib/openzeppelin/contracts/token/ERC20/ERC20.sol";
 import {ERC721} from "../lib/openzeppelin/contracts/token/ERC721/ERC721.sol";
 
-contract ERC20BurnableWithSingleMinter is ERC20 {
+contract TokenboundERC20 is ERC20 {
     address public minter;
     uint8 private _decimals;
 
@@ -32,7 +32,7 @@ contract ERC20BurnableWithSingleMinter is ERC20 {
     }
 }
 
-contract ERC721WithTokenboundERC20 is ERC721 {
+contract BoundERC721 is ERC721 {
     address public tbaRegistryAddress;
     address public tbaImplementationAddress;
     IERC6551Registry private tbaRegistry;
@@ -50,7 +50,7 @@ contract ERC721WithTokenboundERC20 is ERC721 {
 
     function _mintAndDeployTBAAndTBERC20(address to, uint256 tokenId, bytes32 salt, string memory name_, string memory symbol_) internal returns (address, address) {
         tba[tokenId] = tbaRegistry.createAccount(tbaImplementationAddress, salt, block.chainid, address(this), tokenId);
-        ERC20BurnableWithSingleMinter tberc20Contract = new ERC20BurnableWithSingleMinter{salt: salt}(name_, symbol_, decimals, tba[tokenId]);
+        TokenboundERC20 tberc20Contract = new TokenboundERC20{salt: salt}(name_, symbol_, decimals, tba[tokenId]);
         tberc20[tokenId] = address(tberc20Contract);
         _mint(to, tokenId);
         return (tba[tokenId], tberc20[tokenId]);
