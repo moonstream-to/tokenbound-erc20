@@ -12,6 +12,9 @@ This repository implements two contracts:
 2. `BindingERC721` - an ERC721 implementation which is responsible for the deployment of the tokenbound account and the tokenbound ERC20 contract
 bound to each of its NFTs.
 
+Every time an NFT is minted on the `BindingERC721` contract, it deploys a tokenbound account and a tokenbound ERC20 contract
+which respects the minting authority of that tokenbound account (and *only* that tokenbound account).
+
 In this architecture, the ERC721 contract is self-aware in the sense that it has a canonical Tokenbound registry
 and account implementation which it uses to configure its Tokenbound ERC20 contracts.
 
