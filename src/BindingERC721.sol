@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.13;
 
+import {IERC6551Executable} from "../lib/erc6551/src/interfaces/IERC6551Executable.sol";
 import {IERC6551Registry} from "../lib/erc6551/src/ERC6551Registry.sol";
 import {ERC721} from "../lib/openzeppelin/contracts/token/ERC721/ERC721.sol";
 import {TokenboundERC20} from "./TokenboundERC20.sol";
@@ -53,6 +54,14 @@ contract BindingERC721 is ERC721 {
         tberc20[tokenId] = address(tberc20Contract);
         _mint(to, tokenId);
         return (tba[tokenId], tberc20[tokenId]);
+    }
+
+    function mintTokenboundERC20(uint256 tokenId, address to, uint256 amount) public {
+        require(msg.sender == ownerOf(tokenId), "BindingERC721: only the owner of the NFT can mint tokenbound ERC20 tokens");
+        IERC6551Executable boundAccount = IERC6551Executable(payable(tba[tokenId]));
+        _transfer(msg.sender, address(this), tokenId);
+        boundAccount.execute(tberc20[tokenId], 0, abi.encodeWithSelector(TokenboundERC20.mint.selector, to, amount), 0);
+        _transfer(address(this), msg.sender, tokenId);
     }
 }
 

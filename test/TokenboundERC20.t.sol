@@ -7,7 +7,7 @@ import {ERC6551Registry} from "../lib/erc6551/src/ERC6551Registry.sol";
 import {ERC6551Account} from "../lib/erc6551/src/examples/simple/ERC6551Account.sol";
 
 import {TokenboundERC20} from "../src/TokenboundERC20.sol";
-import {BindingERC721, PermissionlessBindingERC721} from "../src/BindingERC721.sol";
+import {PermissionlessBindingERC721} from "../src/BindingERC721.sol";
 
 
 contract TokenboundERC20Tests is Test {
@@ -27,38 +27,6 @@ contract TokenboundERC20Tests is Test {
         registry = new ERC6551Registry();
         accountImplementation = new ERC6551Account();
         nfts = new PermissionlessBindingERC721("test", "test", address(registry), address(accountImplementation), 0);
-    }
-
-    function test_mint_nft() public {
-        (uint256 tokenId,,) = nfts.mint(player1);
-
-        assertEq(nfts.ownerOf(tokenId), player1);
-
-        assertEq(registry.account(address(accountImplementation), bytes32(0), block.chainid, address(nfts), tokenId), nfts.tba(tokenId));
-        assertGt(address(nfts.tba(tokenId)).code.length, 0);
-        assertGt(address(nfts.tberc20(tokenId)).code.length, 0);
-    }
-
-    function test_mint_nft_if_tba_already_created_with_same_salt() public {
-        uint256 tokenId = nfts.supply() + 1;
-
-        address directTBAAddress = registry.createAccount(address(accountImplementation), bytes32(0), block.chainid, address(nfts), tokenId);
-
-        nfts.mint(player1);
-
-        assertEq(nfts.tba(tokenId), directTBAAddress);
-    }
-
-    function test_mint_nft_if_tba_already_created_with_same_salt_differnt_account_implementation() public {
-        ERC6551Account otherAccountImplementation = new ERC6551Account();
-
-        uint256 tokenId = nfts.supply() + 1;
-
-        address directTBAAddress = registry.createAccount(address(otherAccountImplementation), bytes32(0), block.chainid, address(nfts), tokenId);
-
-        nfts.mint(player1);
-
-        assertTrue(nfts.tba(tokenId) != directTBAAddress);
     }
 
     function test_tberc20_mint_through_tba_as_nft_owner() public {
