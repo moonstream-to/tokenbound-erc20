@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: UNLICENSED
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.13;
 
 import {IERC6551Registry} from "../lib/erc6551/src/ERC6551Registry.sol";
