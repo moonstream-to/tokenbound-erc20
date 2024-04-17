@@ -6,24 +6,14 @@ import {Test, console} from "forge-std/Test.sol";
 import {ERC6551Registry} from "../lib/erc6551/src/ERC6551Registry.sol";
 import {ERC6551Account} from "../lib/erc6551/src/examples/simple/ERC6551Account.sol";
 
-import {TokenboundERC20, BindingERC721} from "../src/TokenboundERC20.sol";
-
-contract MockBindingERC721 is BindingERC721 {
-    constructor(address tbaRegistryAddress, address tbaImplementationAddress) BindingERC721("test", "test", tbaRegistryAddress, tbaImplementationAddress, 0) {}
-
-    uint256 public supply;
-
-    function mint(address to, uint256 tokenId) public {
-        _mintAndDeployTBAAndTBERC20(to, tokenId, bytes32(0), "test", "test");
-        supply += 1;
-    }
-}
+import {TokenboundERC20} from "../src/TokenboundERC20.sol";
+import {BindingERC721, PermissionlessBindingERC721} from "../src/BindingERC721.sol";
 
 
 contract TokenboundERC20Tests is Test {
     ERC6551Registry private registry;
     ERC6551Account private accountImplementation;
-    MockBindingERC721 private nfts;
+    PermissionlessBindingERC721 private nfts;
 
     uint256 private player1PrivateKey = 0x1;
     uint256 private player2PrivateKey = 0x2;
@@ -36,12 +26,11 @@ contract TokenboundERC20Tests is Test {
     function setUp() public {
         registry = new ERC6551Registry();
         accountImplementation = new ERC6551Account();
-        nfts = new MockBindingERC721(address(registry), address(accountImplementation));
+        nfts = new PermissionlessBindingERC721("test", "test", address(registry), address(accountImplementation), 0);
     }
 
     function test_mint_nft() public {
-        uint256 tokenId = nfts.supply() + 1;
-        nfts.mint(player1, tokenId);
+        (uint256 tokenId,,) = nfts.mint(player1);
 
         assertEq(nfts.ownerOf(tokenId), player1);
 
@@ -55,7 +44,7 @@ contract TokenboundERC20Tests is Test {
 
         address directTBAAddress = registry.createAccount(address(accountImplementation), bytes32(0), block.chainid, address(nfts), tokenId);
 
-        nfts.mint(player1, tokenId);
+        nfts.mint(player1);
 
         assertEq(nfts.tba(tokenId), directTBAAddress);
     }
@@ -67,14 +56,14 @@ contract TokenboundERC20Tests is Test {
 
         address directTBAAddress = registry.createAccount(address(otherAccountImplementation), bytes32(0), block.chainid, address(nfts), tokenId);
 
-        nfts.mint(player1, tokenId);
+        nfts.mint(player1);
 
         assertTrue(nfts.tba(tokenId) != directTBAAddress);
     }
 
     function test_tberc20_mint_through_tba_as_nft_owner() public {
-        uint256 tokenId = nfts.supply() + 1;
-        nfts.mint(player1, tokenId);
+        (uint256 tokenId,,) = nfts.mint(player1);
+
         TokenboundERC20 tberc20 = TokenboundERC20(nfts.tberc20(tokenId));
         ERC6551Account tba = ERC6551Account(payable(nfts.tba(tokenId)));
 
@@ -88,8 +77,8 @@ contract TokenboundERC20Tests is Test {
     }
 
     function testRevert_tberc20_mint_directly_as_nft_owner() public {
-        uint256 tokenId = nfts.supply() + 1;
-        nfts.mint(player1, tokenId);
+        (uint256 tokenId,,) = nfts.mint(player1);
+
         TokenboundERC20 tberc20 = TokenboundERC20(nfts.tberc20(tokenId));
 
         assertEq(tberc20.balanceOf(player3), 0);
@@ -103,8 +92,8 @@ contract TokenboundERC20Tests is Test {
     }
 
     function testRevert_tberc20_mint_through_tba_as_ex_nft_owner() public {
-        uint256 tokenId = nfts.supply() + 1;
-        nfts.mint(player1, tokenId);
+        (uint256 tokenId,,) = nfts.mint(player1);
+
         TokenboundERC20 tberc20 = TokenboundERC20(nfts.tberc20(tokenId));
         ERC6551Account tba = ERC6551Account(payable(nfts.tba(tokenId)));
 
@@ -120,8 +109,8 @@ contract TokenboundERC20Tests is Test {
     }
 
     function testRevert_tberc20_mint_through_tba_as_nonowner() public {
-        uint256 tokenId = nfts.supply() + 1;
-        nfts.mint(player1, tokenId);
+        (uint256 tokenId,,) = nfts.mint(player1);
+
         TokenboundERC20 tberc20 = TokenboundERC20(nfts.tberc20(tokenId));
         ERC6551Account tba = ERC6551Account(payable(nfts.tba(tokenId)));
 
@@ -136,8 +125,8 @@ contract TokenboundERC20Tests is Test {
     }
 
     function test_tberc20_mint_through_tba_as_new_nft_owner() public {
-        uint256 tokenId = nfts.supply() + 1;
-        nfts.mint(player1, tokenId);
+        (uint256 tokenId,,) = nfts.mint(player1);
+
         TokenboundERC20 tberc20 = TokenboundERC20(nfts.tberc20(tokenId));
         ERC6551Account tba = ERC6551Account(payable(nfts.tba(tokenId)));
 
