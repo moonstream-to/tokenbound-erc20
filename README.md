@@ -48,4 +48,4 @@ For technical documentation:
 forge doc --serve
 ```
 
-You can read the technical documentation directly from this repo using [this index](./docs/src/SUMMARY.md).
+(You can read the technical documentation directly from the repo using [this index](./docs/src/SUMMARY.md).)
