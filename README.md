@@ -1,66 +1,46 @@
-## Foundry
+## Tokenbound ERC20s
 
-**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
+A tokenbound ERC20 is an ERC20 contract which is bound permanently to an NFT. The holder of the NFT has
+the *sole* and *irrevocable* authority to mint tokens on the tokenbound ERC20 contract to anyone they choose.
 
-Foundry consists of:
+This authority transfers with the NFT.
 
--   **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
--   **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
--   **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
--   **Chisel**: Fast, utilitarian, and verbose solidity REPL.
+### How they work
 
-## Documentation
+This repository implements two contracts:
+1. `TokenboundERC20` - the actual ERC20 implementation which confers minting privileges to the holder of the binding NFT.
+2. `BindingERC721` - an ERC721 implementation which is responsible for the deployment of the tokenbound account and the tokenbound ERC20 contract
+bound to each of its NFTs.
 
-https://book.getfoundry.sh/
+In this architecture, the ERC721 contract is self-aware in the sense that it has a canonical Tokenbound registry
+and account implementation which it uses to configure its Tokenbound ERC20 contracts.
 
-## Usage
+### Motivation
 
-### Build
+Tokenbound ERC20s originated as a mechanic in our permissionless game, [The Degen Trail](https://github.om/moonstream-to/degen-trail),
+which is being developed in partnership with [OP Games](https://arcadia.fun/).
 
-```shell
-$ forge build
+We intend to use Tokenbound ERC20s as a system in other games, and feel they might be useful even outside
+of the scope of our games. This is why we are releasing them in a standalone repository.
+
+### Development
+
+This project can be built and tested using [Foundry](https://github.com/foundry-rs/foundry).
+
+To build:
+
+```bash
+forge build
 ```
 
-### Test
+To test:
 
-```shell
-$ forge test
+```bash
+forge test -vvv
 ```
 
-### Format
+For technical documentation:
 
-```shell
-$ forge fmt
-```
-
-### Gas Snapshots
-
-```shell
-$ forge snapshot
-```
-
-### Anvil
-
-```shell
-$ anvil
-```
-
-### Deploy
-
-```shell
-$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
-```
-
-### Cast
-
-```shell
-$ cast <subcommand>
-```
-
-### Help
-
-```shell
-$ forge --help
-$ anvil --help
-$ cast --help
+```bash
+forge doc --serve
 ```

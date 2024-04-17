@@ -6,10 +6,10 @@ import {Test, console} from "forge-std/Test.sol";
 import {ERC6551Registry} from "../lib/erc6551/src/ERC6551Registry.sol";
 import {ERC6551Account} from "../lib/erc6551/src/examples/simple/ERC6551Account.sol";
 
-import {TokenboundERC20, BoundERC721} from "../src/TokenboundERC20.sol";
+import {TokenboundERC20, BindingERC721} from "../src/TokenboundERC20.sol";
 
-contract MockBoundERC721 is BoundERC721 {
-    constructor(address tbaRegistryAddress, address tbaImplementationAddress) BoundERC721("test", "test", tbaRegistryAddress, tbaImplementationAddress, 0) {}
+contract MockBindingERC721 is BindingERC721 {
+    constructor(address tbaRegistryAddress, address tbaImplementationAddress) BindingERC721("test", "test", tbaRegistryAddress, tbaImplementationAddress, 0) {}
 
     uint256 public supply;
 
@@ -23,7 +23,7 @@ contract MockBoundERC721 is BoundERC721 {
 contract TokenboundERC20Tests is Test {
     ERC6551Registry private registry;
     ERC6551Account private accountImplementation;
-    MockBoundERC721 private nfts;
+    MockBindingERC721 private nfts;
 
     uint256 private player1PrivateKey = 0x1;
     uint256 private player2PrivateKey = 0x2;
@@ -36,7 +36,7 @@ contract TokenboundERC20Tests is Test {
     function setUp() public {
         registry = new ERC6551Registry();
         accountImplementation = new ERC6551Account();
-        nfts = new MockBoundERC721(address(registry), address(accountImplementation));
+        nfts = new MockBindingERC721(address(registry), address(accountImplementation));
     }
 
     function test_mint_nft() public {
@@ -48,6 +48,28 @@ contract TokenboundERC20Tests is Test {
         assertEq(registry.account(address(accountImplementation), bytes32(0), block.chainid, address(nfts), tokenId), nfts.tba(tokenId));
         assertGt(address(nfts.tba(tokenId)).code.length, 0);
         assertGt(address(nfts.tberc20(tokenId)).code.length, 0);
+    }
+
+    function test_mint_nft_if_tba_already_created_with_same_salt() public {
+        uint256 tokenId = nfts.supply() + 1;
+
+        address directTBAAddress = registry.createAccount(address(accountImplementation), bytes32(0), block.chainid, address(nfts), tokenId);
+
+        nfts.mint(player1, tokenId);
+
+        assertEq(nfts.tba(tokenId), directTBAAddress);
+    }
+
+    function test_mint_nft_if_tba_already_created_with_same_salt_differnt_account_implementation() public {
+        ERC6551Account otherAccountImplementation = new ERC6551Account();
+
+        uint256 tokenId = nfts.supply() + 1;
+
+        address directTBAAddress = registry.createAccount(address(otherAccountImplementation), bytes32(0), block.chainid, address(nfts), tokenId);
+
+        nfts.mint(player1, tokenId);
+
+        assertTrue(nfts.tba(tokenId) != directTBAAddress);
     }
 
     function test_tberc20_mint_through_tba_as_nft_owner() public {
