@@ -1,5 +1,5 @@
 # PermissionlessBindingERC721
-[Git Source](https://github.com/moonstream-to/tokenbound-erc20/blob/b584017f4f519c3f5c8c0caf5fe209d68eb59ca6/src/BindingERC721.sol)
+[Git Source](https://github.com/moonstream-to/tokenbound-erc20/blob/bc035748c1f27eaf04a1c7efb8b24f0c6f79bb6a/src/BindingERC721.sol)
 
 **Inherits:**
 [BindingERC721](/src/BindingERC721.sol/contract.BindingERC721.md)
@@ -62,8 +62,8 @@ function mint(address to) public returns (uint256, address, address);
 
 |Name|Type|Description|
 |----|----|-----------|
-|`<none>`|`uint256`|The token ID of the newly minted token, the address of the tokenbound account which has ERC20 minting control, and the address of the TokenboundERC20 contract.|
-|`<none>`|`address`||
-|`<none>`|`address`||
+|`<none>`|`uint256`|The token ID of the newly minted token.|
+|`<none>`|`address`|The address of the tokenbound account which has tokenbound ERC20 minting control.|
+|`<none>`|`address`|The address of the TokenboundERC20 contract.|
 
 

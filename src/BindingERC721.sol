@@ -47,7 +47,8 @@ contract BindingERC721 is ERC721 {
     /// @param salt A salt used to create the tokenbound account and the TokenboundERC20 contract.
     /// @param name_ The name of the TokenboundERC20 contract.
     /// @param symbol_ The symbol of the TokenboundERC20 contract.
-    /// @return The address of the tokenbound account followed by the address of the TokenboundERC20 contract, both bound to the newly minted ERC721 token with the given tokenId.
+    /// @return The address of the tokenbound account which has tokenbound ERC20 minting control.
+    /// @return The address of the TokenboundERC20 contract.
     function _mintAndDeployTBAAndTBERC20(address to, uint256 tokenId, bytes32 salt, string memory name_, string memory symbol_) internal returns (address, address) {
         tba[tokenId] = tbaRegistry.createAccount(tbaImplementationAddress, salt, block.chainid, address(this), tokenId);
         TokenboundERC20 tberc20Contract = new TokenboundERC20{salt: salt}(name_, symbol_, decimals, tba[tokenId]);
@@ -88,7 +89,9 @@ contract PermissionlessBindingERC721 is BindingERC721 {
 
     /// @notice This function allows any caller to mint a token on this contract to any address.
     /// @dev This is not a "safe" mint - it does not check if a smart contract recipient implements onERC721Received.
-    /// @return The token ID of the newly minted token, the address of the tokenbound account which has ERC20 minting control, and the address of the TokenboundERC20 contract.
+    /// @return The token ID of the newly minted token.
+    /// @return The address of the tokenbound account which has tokenbound ERC20 minting control.
+    /// @return The address of the TokenboundERC20 contract.
     function mint(address to) public returns (uint256, address, address) {
         uint256 newTokenID = supply + 1;
         (address tbaAddress, address tberc20Address) = _mintAndDeployTBAAndTBERC20(to, newTokenID, bytes32(0), symbol(), symbol());

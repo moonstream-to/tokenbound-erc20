@@ -1,5 +1,5 @@
 # TokenboundERC20
-[Git Source](https://github.com/moonstream-to/tokenbound-erc20/blob/b584017f4f519c3f5c8c0caf5fe209d68eb59ca6/src/TokenboundERC20.sol)
+[Git Source](https://github.com/moonstream-to/tokenbound-erc20/blob/bc035748c1f27eaf04a1c7efb8b24f0c6f79bb6a/src/TokenboundERC20.sol)
 
 **Inherits:**
 ERC20
