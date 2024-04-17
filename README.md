@@ -28,7 +28,9 @@ of the scope of our games. This is why we are releasing them in a standalone rep
 
 ### Development
 
-This project can be built and tested using [Foundry](https://github.com/foundry-rs/foundry).
+#### Smart contracts
+
+The smart contracts project can be built and tested using [Foundry](https://github.com/foundry-rs/foundry).
 
 To build:
 
@@ -49,3 +51,9 @@ forge doc --serve
 ```
 
 (You can read the technical documentation directly from the repo using [this index](./docs/src/SUMMARY.md).)
+
+#### `stamper`
+
+#### Make
+
+`make`, `make test`, etc. Look at the [Makefile](./Makefile).
