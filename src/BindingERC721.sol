@@ -56,6 +56,10 @@ contract BindingERC721 is ERC721 {
         return (tba[tokenId], tberc20[tokenId]);
     }
 
+    /// @notice This function allows the current owner of a token on this contract to mint on its tokenbound ERC20 contract
+    /// without having to interact directly with the tokenbound account.
+    /// @dev This function atomically transfers the binding NFT to this contract, performs the tokenbound ERC20 mint, and then
+    /// transfers the binding NFT back to its original owner.
     function mintTokenboundERC20(uint256 tokenId, address to, uint256 amount) public {
         require(msg.sender == ownerOf(tokenId), "BindingERC721: only the owner of the NFT can mint tokenbound ERC20 tokens");
         IERC6551Executable boundAccount = IERC6551Executable(payable(tba[tokenId]));
